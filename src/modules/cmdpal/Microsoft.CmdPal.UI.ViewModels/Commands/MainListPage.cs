@@ -32,6 +32,7 @@ public partial class MainListPage : DynamicListPage,
     public MainListPage(IServiceProvider serviceProvider)
     {
         Icon = IconHelpers.FromRelativePath("Assets\\StoreLogo.scale-200.png");
+        PlaceholderText = Properties.Resources.builtin_main_list_page_searchbar_placeholder;
         _serviceProvider = serviceProvider;
 
         _tlcManager = _serviceProvider.GetService<TopLevelCommandManager>()!;
@@ -164,6 +165,11 @@ public partial class MainListPage : DynamicListPage,
                 if (_includeApps)
                 {
                     IEnumerable<IListItem> apps = AllAppsCommandProvider.Page.GetItems();
+                    var appIds = apps.Select(app => app.Command.Id).ToArray();
+
+                    // Remove any top level pinned apps and use the apps from AllAppsCommandProvider.Page.GetItems()
+                    // since they contain details.
+                    _filteredItems = _filteredItems.Where(item => item.Command is not AppCommand);
                     _filteredItems = _filteredItems.Concat(apps);
                 }
             }
