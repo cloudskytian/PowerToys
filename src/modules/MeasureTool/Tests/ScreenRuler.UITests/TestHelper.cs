@@ -378,12 +378,12 @@ namespace ScreenRuler.UITests
             testBase.SendKeys(activationKeys);
 
             Assert.IsTrue(
-                WaitForScreenRulerUI(testBase, 2000),
+                WaitForScreenRulerUI(testBase, 1000),
                 $"ScreenRulerUI should appear after pressing activation shortcut: {string.Join(" + ", activationKeys)}");
 
             // Attach to ScreenRuler window and click bounds button
             testBase.Session.Attach(PowerToysModule.ScreenRuler);
-            var boundsButton = testBase.Session.Find<Element>(By.AccessibilityId(BoundsButtonId), 15000, true);
+            var boundsButton = testBase.Session.Find<Element>("Bounds (Ctrl+1)", 15000, true);
             Assert.IsNotNull(boundsButton, "Bounds button should be found");
 
             boundsButton.Click();
