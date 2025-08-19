@@ -170,7 +170,7 @@ public partial class Win32Program : IProgram
 
     public bool QueryEqualsNameForRunCommands(string query)
     {
-        if (query != null && AppType == ApplicationType.RunCommand)
+        if (query is not null && AppType == ApplicationType.RunCommand)
         {
             // Using OrdinalIgnoreCase since this is used internally
             if (!query.Equals(Name, StringComparison.OrdinalIgnoreCase) && !query.Equals(ExecutableName, StringComparison.OrdinalIgnoreCase))
@@ -668,7 +668,7 @@ public partial class Win32Program : IProgram
         var paths = new List<string>();
         using (var root = Registry.LocalMachine.OpenSubKey(appPaths))
         {
-            if (root != null)
+            if (root is not null)
             {
                 paths.AddRange(GetPathsFromRegistry(root));
             }
@@ -676,7 +676,7 @@ public partial class Win32Program : IProgram
 
         using (var root = Registry.CurrentUser.OpenSubKey(appPaths))
         {
-            if (root != null)
+            if (root is not null)
             {
                 paths.AddRange(GetPathsFromRegistry(root));
             }
@@ -701,7 +701,7 @@ public partial class Win32Program : IProgram
         {
             using (var key = root.OpenSubKey(subkey))
             {
-                if (key == null)
+                if (key is null)
                 {
                     return string.Empty;
                 }
@@ -743,13 +743,13 @@ public partial class Win32Program : IProgram
 
         public bool Equals(Win32Program? app1, Win32Program? app2)
         {
-            if (app1 == null && app2 == null)
+            if (app1 is null && app2 is null)
             {
                 return true;
             }
 
-            return app1 != null
-                    && app2 != null
+            return app1 is not null
+                    && app2 is not null
                     && (app1.Name?.ToUpperInvariant(), app1.ExecutableName?.ToUpperInvariant(), app1.FullPath?.ToUpperInvariant())
                     .Equals((app2.Name?.ToUpperInvariant(), app2.ExecutableName?.ToUpperInvariant(), app2.FullPath?.ToUpperInvariant()));
         }
@@ -909,7 +909,7 @@ public partial class Win32Program : IProgram
             Parallel.ForEach(paths, source =>
             {
                 var program = GetProgramFromPath(source);
-                if (program != null)
+                if (program is not null)
                 {
                     programsList.Add(program);
                 }
@@ -919,7 +919,7 @@ public partial class Win32Program : IProgram
             Parallel.ForEach(runCommandPaths, source =>
             {
                 var program = GetRunCommandProgramFromPath(source);
-                if (program != null)
+                if (program is not null)
                 {
                     runCommandProgramsList.Add(program);
                 }
