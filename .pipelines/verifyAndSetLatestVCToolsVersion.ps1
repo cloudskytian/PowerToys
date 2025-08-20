@@ -1,7 +1,4 @@
-$extraVersionTarget = "";
-if($env:VCWhereExtraVersionTarget) {
-    $extraVersionTarget = "`"$env:VCWhereExtraVersionTarget`"";
-}
+$extraVersionTarget = $env:VCWhereExtraVersionTarget;
 $VSInstances = ([xml](& 'C:\Program Files (x86)\Microsoft Visual Studio\Installer\vswhere.exe' -latest $extraVersionTarget -requires Microsoft.VisualStudio.Component.VC.Tools.x86.x64 -include packages -format xml))
 $VSPackages = $VSInstances.instances.instance.packages.package
 $LatestVCPackage = ($VSPackages | ? { $_.id -eq "Microsoft.VisualCpp.Tools.Core" })
