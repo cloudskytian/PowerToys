@@ -151,7 +151,6 @@ jobs:
         $MSBuildCacheParameters += " -reportfileaccesses"
         $MSBuildCacheParameters += " -p:MSBuildCacheEnabled=true"
         $MSBuildCacheParameters += " -p:MSBuildCacheLogDirectory=$(LogOutputDirectory)\MSBuildCacheLogs"
-        $MSBuildCacheParameters += " -p:UseSharedCompilation=false"
         
         Write-Host "MSBuildCacheParameters: $MSBuildCacheParameters"
         Write-Host "##vso[task.setvariable variable=MSBuildCacheParameters]$MSBuildCacheParameters"
