@@ -23,35 +23,9 @@
 namespace NonLocalizable
 {
     const wchar_t ToolWindowClassName[] = L"FancyZones_ZonesOverlay";
-    const wchar_t ToolWindowName[] = L"FancyZones_ZonesOverlay";
 }
 
 using namespace FancyZonesUtils;
-
-namespace
-{
-    int AdjustSpacingForRegistry(int originalSpacing)
-    {
-        // Check Windows DWM ColorPrevalence setting
-        // When ColorPrevalence = 0 (accent color not shown), subtract 1 from spacing
-        HKEY hKey;
-        DWORD dwValue = 1; // Default to 1 (accent color shown)
-        DWORD dwSize = sizeof(DWORD);
-        
-        if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\DWM", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
-        {
-            RegQueryValueExW(hKey, L"ColorPrevalence", nullptr, nullptr, reinterpret_cast<LPBYTE>(&dwValue), &dwSize);
-            RegCloseKey(hKey);
-        }
-        
-        // Apply -1 margin when ColorPrevalence = 0 (accent color not shown)
-        if (dwValue == 0)
-        {
-            return originalSpacing - 1;
-        }
-        return originalSpacing;
-    }
-}
 
 namespace
 {
@@ -85,7 +59,7 @@ namespace
             HWND windowFromPool = ExtractWindow();
             if (windowFromPool == NULL)
             {
-                HWND window = CreateWindowExW(WS_EX_TOOLWINDOW, NonLocalizable::ToolWindowClassName, NonLocalizable::ToolWindowName, WS_POPUP, position.left(), position.top(), position.width(), position.height(), nullptr, nullptr, hinstance, owner);
+                HWND window = CreateWindowExW(WS_EX_TOOLWINDOW, NonLocalizable::ToolWindowClassName, L"", WS_POPUP, position.left(), position.top(), position.width(), position.height(), nullptr, nullptr, hinstance, owner);
                 Logger::info("Creating new ZonesOverlay window, hWnd = {}", (void*)window);
                 FancyZonesWindowUtils::MakeWindowTransparent(window);
 
@@ -330,14 +304,7 @@ void WorkArea::CalculateZoneSet()
         return;
     }
 
-    // Apply registry-based spacing adjustment at the data level
-    auto layoutData = appliedLayout.value();
-    if (layoutData.showSpacing)
-    {
-        layoutData.spacing = AdjustSpacingForRegistry(layoutData.spacing);
-    }
-
-    m_layout = std::make_unique<Layout>(layoutData);
+    m_layout = std::make_unique<Layout>(appliedLayout.value());
     m_layout->Init(m_workAreaRect, m_uniqueId.monitorId.monitor);
 }
 
