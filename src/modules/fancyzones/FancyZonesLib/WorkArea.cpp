@@ -30,6 +30,31 @@ using namespace FancyZonesUtils;
 
 namespace
 {
+    int AdjustSpacingForRegistry(int originalSpacing)
+    {
+        // Check Windows DWM ColorPrevalence setting
+        // When ColorPrevalence = 0 (accent color not shown), subtract 1 from spacing
+        HKEY hKey;
+        DWORD dwValue = 1; // Default to 1 (accent color shown)
+        DWORD dwSize = sizeof(DWORD);
+        
+        if (RegOpenKeyExW(HKEY_CURRENT_USER, L"Software\\Microsoft\\Windows\\DWM", 0, KEY_READ, &hKey) == ERROR_SUCCESS)
+        {
+            RegQueryValueExW(hKey, L"ColorPrevalence", nullptr, nullptr, reinterpret_cast<LPBYTE>(&dwValue), &dwSize);
+            RegCloseKey(hKey);
+        }
+        
+        // Apply -1 margin when ColorPrevalence = 0 (accent color not shown)
+        if (dwValue == 0)
+        {
+            return originalSpacing - 1;
+        }
+        return originalSpacing;
+    }
+}
+
+namespace
+{
     // The reason for using this class is the need to call ShowWindow(window, SW_SHOWNORMAL); on each
     // newly created window for it to be displayed properly. The call sometimes has side effects when
     // a fullscreen app is running, and happens when the resolution change event is triggered
@@ -305,7 +330,14 @@ void WorkArea::CalculateZoneSet()
         return;
     }
 
-    m_layout = std::make_unique<Layout>(appliedLayout.value());
+    // Apply registry-based spacing adjustment at the data level
+    auto layoutData = appliedLayout.value();
+    if (layoutData.showSpacing)
+    {
+        layoutData.spacing = AdjustSpacingForRegistry(layoutData.spacing);
+    }
+
+    m_layout = std::make_unique<Layout>(layoutData);
     m_layout->Init(m_workAreaRect, m_uniqueId.monitorId.monitor);
 }
 
